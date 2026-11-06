@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Бесплатный конструктор точных промптов для генерации и редактирования изображений.">
+  <title>Promptform — конструктор промптов для изображений</title>
+  <style>
+    :root{--bg:#090c12;--surface:#111720;--surface2:#151c27;--border:#283240;--text:#edf3f7;--muted:#93a4b5;--accent:#b9ff67;--accent2:#80baff;--radius:18px;--shadow:0 25px 80px rgba(0,0,0,.28)}
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(700px 460px at 10% -100px,rgba(117,161,218,.11),transparent),radial-gradient(600px 520px at 100% 100px,rgba(133,196,73,.06),transparent),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.48}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .top{border-bottom:1px solid var(--border);background:rgba(9,12,18,.8)}
+    .top-inner{max-width:1440px;padding:20px 38px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);font-size:18px;font-weight:850;letter-spacing:-.045em}
+    .brand-badge{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--accent);color:#16200e;font-weight:950;font-size:19px}
+    .brand span small{display:block;color:var(--muted);font-size:9px;letter-spacing:.19em;font-weight:700;margin-top:-3px}
+    .top-right{display:flex;align-items:center;gap:12px}
+    .status{font-size:12px;color:var(--muted)}
+    .status:before{content:"";width:7px;height:7px;background:var(--accent);display:inline-block;border-radius:100%;margin-right:8px}
+    .outline-btn{background:transparent;border:1px solid var(--border);border-radius:11px;color:var(--text);padding:10px 14px;font-size:13px}
+    .outline-btn:hover{border-color:#78899b}
+    .wrap{max-width:1440px;margin:0 auto;padding:46px 38px 48px}
+    .eyebrow{display:inline-flex;gap:9px;align-items:center;color:var(--accent);font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:11px}
+    .eyebrow:before{content:"";height:1px;width:22px;background:var(--accent)}
+    h1{font-size:clamp(30px,4.4vw,58px);line-height:1.06;letter-spacing:-.055em;margin:13px 0 14px;font-weight:790;max-width:830px}
+    h1 i{color:var(--accent);font-style:normal}
+    .intro{font-size:15px;color:var(--muted);max-width:710px;margin:0 0 34px}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(360px,.94fr);gap:22px;align-items:start}
+    .panel{border:1px solid var(--border);background:rgba(17,23,32,.94);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .panel-head{padding:26px 27px 18px;display:flex;align-items:start;justify-content:space-between;gap:16px}
+    .section-num{font-size:11px;font-weight:750;color:var(--accent);letter-spacing:.13em;margin-bottom:7px}
+    h2{font-size:20px;line-height:1.3;letter-spacing:-.028em;margin:0;font-weight:760}
+    .sub{color:var(--muted);font-size:12px;margin:6px 0 0}
+    .field-section{padding:0 27px 26px}
+    .separator{height:1px;background:var(--border);margin:0 27px 25px}
+    .presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+    .preset{min-height:72px;border:1px solid var(--border);background:var(--surface2);color:#c5d1dc;border-radius:13px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;padding:12px;gap:7px;transition:.18s}
+    .preset:hover{border-color:#61798a;transform:translateY(-1px)}
+    .preset.active{background:rgba(185,255,103,.085);color:var(--accent);border-color:rgba(185,255,103,.7)}
+    .preset-icon{font-size:20px;line-height:1}
+    .preset-label{font-size:12px;font-weight:730}
+    .section-title{font-size:15px;font-weight:760;letter-spacing:-.025em;margin:0 0 17px}
+    label{display:block;font-weight:680;font-size:12px;color:#cbd7e1;margin:0 0 8px}
+    .field{margin-bottom:17px}
+    input[type="text"],textarea,select{width:100%;background:#0e141d;border:1px solid var(--border);color:var(--text);border-radius:11px;outline:none;padding:12px 13px;font-size:13px;resize:vertical;transition:.2s}
+    input[type="text"]:focus,textarea:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(128,186,255,.085)}
+    textarea{min-height:71px}
+    textarea::placeholder,input::placeholder{color:#677889}
+    select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2393a4b5' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:34px}
+    .pair{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .note{color:#7c90a4;font-size:11px;margin:6px 0 0}
+    .toggles{display:grid;gap:9px}
+    .toggle{display:flex;gap:12px;align-items:center;background:#0e141d;border:1px solid var(--border);border-radius:11px;padding:12px 13px;color:#cbd7e1;font-size:12.5px;cursor:pointer;margin:0}
+    .toggle input{width:17px;height:17px;accent-color:var(--accent);margin:0;flex-shrink:0}
+    .left-footer{border-top:1px solid var(--border);padding:18px 27px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .muted{font-size:11px;color:var(--muted)}
+    .preview{position:sticky;top:18px}
+    .output-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:25px 25px 19px}
+    .live{color:var(--accent);background:rgba(185,255,103,.09);padding:6px 10px;border-radius:20px;font-size:11px;font-weight:750;white-space:nowrap}
+    .live:before{content:"";background:var(--accent);width:6px;height:6px;display:inline-block;border-radius:50%;margin-right:6px}
+    .out-actions{display:flex;gap:9px;padding:0 25px 17px;flex-wrap:wrap}
+    .primary{background:var(--accent);color:#14200a;border:0;padding:12px 18px;border-radius:11px;font-size:13px;font-weight:800;display:inline-flex;gap:9px;align-items:center;justify-content:center}
+    .primary:hover{background:#d2ff91}
+    .secondary{background:#1a2430;color:#d5e2ed;border:1px solid #354354;padding:11px 14px;border-radius:11px;font-size:12px;font-weight:650}
+    .secondary:hover{background:#263241}
+    .output-frame{border-top:1px solid var(--border);background:#0b1017;padding:23px 25px}
+    .output{white-space:pre-wrap;word-wrap:break-word;color:#cedae4;font-size:13px;line-height:1.75;margin:0;max-height:670px;overflow-y:auto;font-family:"Segoe UI",Arial,sans-serif}
+    .output::selection{background:#476735;color:#fff}
+    .output-info{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 25px;border-top:1px solid var(--border);color:var(--muted);font-size:11px}
+    .tips{margin-top:15px;padding:20px 23px;border:1px solid #344234;background:rgba(185,255,103,.035);border-radius:16px}
+    .tips h3{font-size:13px;margin:0 0 9px;color:#d7f5b6}
+    .tips p{font-size:12px;color:#aab6bf;margin:0;line-height:1.75}
+    .tips strong{color:#dce7ce}
+    .footer{border-top:1px solid var(--border);margin-top:38px;padding:24px 0;color:#748699;font-size:12px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:11px 17px;border-radius:12px;background:#defeb6;color:#15220b;font-weight:740;font-size:13px;box-shadow:var(--shadow);transition:.24s;z-index:9}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    .modal-back{position:fixed;inset:0;background:#020508d9;display:none;place-items:center;padding:20px;z-index:15}
+    .modal-back.visible{display:grid}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;max-width:525px;width:100%;padding:28px;box-shadow:var(--shadow)}
+    .modal h2{margin-bottom:10px}
+    .modal p,.modal li{font-size:13px;color:var(--muted);line-height:1.7}
+    .modal ol{padding-left:18px}
+    .modal .outline-btn{margin-top:10px}
+    @media(max-width:1050px){.workspace{grid-template-columns:1fr}.preview{position:static}.output{max-height:540px}.presets{grid-template-columns:repeat(4,1fr)}}
+    @media(max-width:650px){.top-inner{padding:15px 17px}.top-right .status{display:none}.wrap{padding:30px 15px}.panel-head{padding:22px 19px 16px}.field-section{padding:0 19px 23px}.separator{margin:0 19px 22px}.presets{grid-template-columns:repeat(2,1fr)}.pair{grid-template-columns:1fr}.left-footer{padding:18px 19px}.output-head{padding:22px 19px 16px}.out-actions{padding:0 19px 16px}.output-frame{padding:20px 19px}.output-info{padding:14px 19px}.primary{flex:1}.secondary{flex:1}h1{font-size:38px}.intro{font-size:14px}.footer{margin-top:28px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="#" aria-label="Promptform">
+        <div class="brand-badge">P</div>
+        <span>PROMPTFORM <small>IMAGE PROMPT STUDIO</small></span>
+      </a>
+      <div class="top-right">
+        <span class="status">Работает без аккаунта</span>
+        <button class="outline-btn" id="helpButton">Как поделиться ↗</button>
+      </div>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="eyebrow">Удобный инструмент для дизайнера</div>
+    <h1>Точный промпт.<br><i>Сильный результат.</i></h1>
+    <p class="intro">Выбери задачу, настрой композицию, свет и ограничения. Готовый промпт соберётся автоматически. Всё работает прямо в браузере — без установки и регистрации.</p>
+    <div class="workspace">
+      <section class="panel" aria-label="Настройки промпта">
+        <div class="panel-head">
+          <div><div class="section-num">ШАГ 01</div><h2>Выбери задачу</h2><p class="sub">Шаблоны адаптируют структуру и стартовые настройки.</p></div>
+        </div>
+        <div class="field-section">
+          <div class="presets" id="presets" role="group" aria-label="Тип задачи"></div>
+        </div>
+        <div class="separator"></div>
+        <div class="field-section">
+          <div class="section-num">ШАГ 02</div>
+          <div class="section-title">Опиши желаемый кадр</div>
+          <div class="field"><label for="subject">Продукт / главный объект</label><input id="subject" type="text" placeholder="Например, бутылка протеинового коктейля"></div>
+          <div class="field"><label for="goal" id="goalLabel">Что нужно сделать</label><textarea id="goal" placeholder="Опиши конкретный результат"></textarea></div>
+          <div class="field"><label for="scene">Сцена и окружение</label><textarea id="scene" placeholder="Фон, предметы, атмосфера"></textarea></div>
+          <div class="field"><label for="composition">Композиция и ракурс</label><textarea id="composition" placeholder="Где расположен объект, точка съёмки, свободное пространство"></textarea></div>
+          <div class="field"><label for="lighting">Свет</label><textarea id="lighting" placeholder="Направление и характер света, тени, блики"></textarea></div>
+          <div class="field"><label for="style">Стиль</label>
+            <select id="style">
+              <option value="photo">Фотореалистичная реклама</option>
+              <option value="cinema">Кинематографичная фотография</option>
+              <option value="studio3d">Премиальный 3D / CGI</option>
+              <option value="minimal">Минимализм / editorial</option>
+              <option value="vector">Чистая векторная графика</option>
+              <option value="ui">UI / веб-дизайн</option>
+              <option value="reference">Стиль по референсу</option>
+            </select>
+          </div>
+        </div>
+        <div class="separator"></div>
+        <div class="field-section">
+          <div class="section-num">ШАГ 03</div>
+          <div class="section-title">Референсы и ограничения</div>
+          <div class="field"><label for="references">Роли прикреплённых изображений</label><textarea id="references" placeholder="Изображение 1 — продукт; изображение 2 — композиция..."></textarea><p class="note">Файлы прикрепляются отдельно в генераторе изображений. Здесь указываются их роли.</p></div>
+          <div class="field"><label for="constraints">Дополнительные требования</label><textarea id="constraints" placeholder="Например, не менять диаметр крышки, избегать случайных предметов"></textarea></div>
+          <div class="pair">
+            <div class="field"><label for="ratio">Соотношение сторон</label>
+              <select id="ratio"><option>3:4</option><option>9:16</option><option>16:9</option><option>1:1</option><option>4:3</option><option>2:3</option><option>3:2</option><option>По исходнику</option></select>
+            </div>
+            <div class="field"><label for="size">Точный размер, если нужен</label><input id="size" type="text" placeholder="Например, 1080×1440"></div>
+          </div>
+          <div class="toggles">
+            <label class="toggle"><input type="checkbox" id="preserveProduct"> Сохранить форму, пропорции, этикетку и детали продукта</label>
+            <label class="toggle"><input type="checkbox" id="preserveFrame"> Сохранить ракурс и композицию исходника</label>
+            <label class="toggle"><input type="checkbox" id="noText"> Без дополнительных надписей и водяных знаков</label>
+            <label class="toggle"><input type="checkbox" id="spaceForText"> Оставить свободное место для будущего текста</label>
+            <label class="toggle"><input type="checkbox" id="alpha"> Настоящий прозрачный фон (alpha channel)</label>
+          </div>
+        </div>
+        <div class="left-footer">
+          <span class="muted">Настройки сохраняются в этом браузере</span>
+          <button id="reset" class="outline-btn" type="button">↺ Сбросить</button>
+        </div>
+      </section>
+      <aside class="preview" aria-label="Готовый промпт">
+        <div class="panel">
+          <div class="output-head">
+            <div><div class="section-num">ВАШ РЕЗУЛЬТАТ</div><h2>Готовый промпт</h2></div>
+            <span class="live">LIVE</span>
+          </div>
+          <div class="out-actions">
+            <button class="primary" id="copy">▣ Скопировать</button>
+            <button class="secondary" id="download">↓ Скачать .txt</button>
+            <button class="secondary" id="share">↗ Ссылка</button>
+          </div>
+          <div class="output-frame"><pre class="output" id="output" aria-live="polite"></pre></div>
+          <div class="output-info"><span id="stats">0 символов</span><span>Обновляется автоматически</span></div>
+        </div>
+        <div class="tips">
+          <h3>✦ Как получать более точные результаты</h3>
+          <p><strong>Для точного товара:</strong> приложи оригинальное изображение упаковки вместе с промптом. <strong>Для редактирования:</strong> формулируй одно изменение за раз. <strong>Для текста:</strong> добавляй его на макете отдельно, если нужна стопроцентная точность.</p>
+        </div>
+      </aside>
+    </div>
+    <footer class="footer">
+      <span>PROMPTFORM · Самостоятельный конструктор изображений</span>
+      <span>Без внешних библиотек · Работает офлайн · Ваши данные остаются в браузере</span>
+    </footer>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-back" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <h2 id="modalTitle">Как поделиться конструктором</h2>
+      <p>Это самостоятельная HTML-страница: можно пользоваться офлайн или опубликовать её в интернете.</p>
+      <ol>
+        <li>Для себя: открой файл <strong>promptform.html</strong> двойным щелчком.</li>
+        <li>Для других: размести файл на GitHub Pages, Netlify или своём сайте.</li>
+        <li>После публикации кнопка <strong>«Ссылка»</strong> создаст ссылку с текущими заполненными настройками.</li>
+      </ol>
+      <p>Сама страница не отправляет поля на сервер. При создании ссылки выбранные настройки включаются в адрес, поэтому не добавляй туда конфиденциальные данные.</p>
+      <button class="outline-btn" id="closeModal">Понятно</button>
+    </div>
+  </div>
+  <script>
+  (function(){
+    "use strict";
+    const presets = {
+      product:{label:"Предметная съёмка",icon:"◈",lead:"Создай профессиональную предметную рекламную фотографию.",subject:"Молочный протеиновый коктейль",goal:"Покажи продукт как главный визуальный акцент премиальной коммерческой фотосъёмки.",scene:"Чистая минималистичная студия, спокойный градиентный фон, реалистичная поверхность.",composition:"Продукт целиком в центре кадра, ракурс 3/4, достаточное пространство вокруг.",lighting:"Большой мягкий источник слева, лёгкий контровой свет справа, натуральные отражения и контактные тени.",style:"photo",references:"Изображение 1 — точный внешний вид продукта и этикетки.",constraints:"Не изменять конструкцию упаковки и не придумывать новые элементы.",ratio:"3:4",preserveProduct:true,noText:true},
+      lifestyle:{label:"Lifestyle",icon:"◇",lead:"Создай фотореалистичную lifestyle-рекламу с естественной постановкой.",subject:"Спортсмен с протеиновым коктейлем",goal:"Покажи живой рекламный момент: человек естественно взаимодействует с продуктом.",scene:"Современный просторный спортзал с оборудованием в глубине кадра.",composition:"Среднеширокий ракурс на уровне груди, человек слева, продукт хорошо виден в руке.",lighting:"Мягкий дневной свет из окон, натуральная кожа и достоверные тени.",style:"cinema",references:"Изображение 1 — точная упаковка продукта; изображение 2 — атмосфера и композиция.",constraints:"Анатомически корректные руки, естественный хват, без пластиковых текстур.",ratio:"3:4",preserveProduct:true,noText:true},
+      edit:{label:"Точная правка",icon:"✎",lead:"Выполни точечное редактирование исходного изображения.",subject:"Объект на прикреплённой фотографии",goal:"Измени только указанный элемент исходного изображения. Укажи здесь конкретное изменение.",scene:"Оставь исходное окружение без изменений.",composition:"Сохрани оригинальное положение камеры, кадрирование и перспективу.",lighting:"Сохрани существующие свет, блики и тени.",style:"reference",references:"Изображение 1 — исходник, который необходимо отредактировать.",constraints:"Не перерисовывай изображение целиком. Не меняй остальные элементы.",ratio:"По исходнику",preserveProduct:true,preserveFrame:true,noText:true},
+      background:{label:"Смена фона",icon:"▧",lead:"Замени окружение на исходной фотографии, не меняя главный объект.",subject:"Продукт на прикреплённой фотографии",goal:"Измени только фон и естественно интегрируй продукт в новое окружение.",scene:"Современное светлое пространство с глубиной и аккуратной фактурой.",composition:"Сохрани исходное расположение продукта, масштаб и ракурс.",lighting:"Согласуй новый фон с исходным светом на товаре; добавь правдоподобную контактную тень.",style:"photo",references:"Изображение 1 — исходный продукт; изображение 2 — желаемый фон (при наличии).",constraints:"Не деформируй упаковку и не меняй детали этикетки.",ratio:"3:4",preserveProduct:true,preserveFrame:true,noText:true},
+      transparent:{label:"PNG без фона",icon:"◌",lead:"Изолируй главный объект на полностью прозрачном фоне.",subject:"Продукт с прикреплённого изображения",goal:"Аккуратно выдели объект с чистым непрерывным контуром и реальной прозрачностью за ним.",scene:"Никакого фона, подложки, шахматного узора или окружения.",composition:"Один объект полностью внутри кадра, по центру, без обрезки.",lighting:"Сохрани оригинальную светотеневую моделировку объекта.",style:"photo",references:"Изображение 1 — точный внешний вид объекта.",constraints:"Без ореолов, остатков фона и дополнительных теней за пределами объекта.",ratio:"3:4",preserveProduct:true,noText:true,alpha:true},
+      render:{label:"3D-рендер",icon:"⬡",lead:"Создай высокодетализированный фотореалистичный 3D product render.",subject:"Упаковка продукта по исходной фотографии",goal:"Передай объём, материал и конструкцию продукта в профессиональном CGI-кадре.",scene:"Нейтральная студия с минимальным фоном и аккуратной поверхностью.",composition:"Ракурс 3/4, предмет целиком в кадре, корректная перспектива.",lighting:"Несколько крупных рассеянных источников, контролируемые блики, мягкий rim light.",style:"studio3d",references:"Изображение 1 — точная форма и дизайн упаковки.",constraints:"Реалистичный материал, без неестественных выпуклостей и произвольных надписей.",ratio:"3:4",preserveProduct:true,noText:true},
+      composite:{label:"Объединить фото",icon:"▣",lead:"Органично объедини несколько прикреплённых фотографий в одну сцену.",subject:"Продукт из второго изображения",goal:"Перенеси продукт в сцену первого изображения с физически правдоподобной интеграцией.",scene:"Используй пространство и окружение исходного фонового изображения.",composition:"Соблюдай масштаб относительно других объектов, перспективу и глубину кадра.",lighting:"Согласуй температуру, направление света, тени, зерно и резкость.",style:"photo",references:"Изображение 1 — фон и композиция; изображение 2 — продукт; изображение 3 — стиль при наличии.",constraints:"Не смешивай элементы разных этикеток; не добавляй лишних предметов.",ratio:"16:9",preserveProduct:true,noText:true},
+      banner:{label:"Баннер",icon:"▤",lead:"Создай современный коммерческий рекламный баннер.",subject:"Продукт для рекламной кампании",goal:"Сформируй выразительную композицию для размещения рекламного заголовка и CTA.",scene:"Контрастный минималистичный фон с глубиной и аккуратными акцентами.",composition:"Продукт в правой трети кадра, слева крупная чистая область под типографику.",lighting:"Премиальное рекламное освещение с контролируемыми отражениями.",style:"photo",references:"Изображение 1 — продукт; изображение 2 — пример композиции, если есть.",constraints:"Не рисуй текст самостоятельно: текст будет добавлен на этапе вёрстки.",ratio:"16:9",preserveProduct:true,noText:true,spaceForText:true},
+      ui:{label:"UI / сайт",icon:"▥",lead:"Спроектируй реалистичный современный экран веб-интерфейса.",subject:"Главная страница интернет-магазина",goal:"Создай целостный e-commerce интерфейс с продуманной визуальной иерархией.",scene:"Header, hero, категории, карточки товаров, CTA, преимущества и footer.",composition:"Десктопная сетка, согласованные отступы, выравнивание, достаточный воздух.",lighting:"Не применимо: приоритет на типографику, сетку и UI-компоненты.",style:"ui",references:"Изображение 1 — контент или старый дизайн; изображение 2 — желаемый стиль при наличии.",constraints:"Реалистичные размеры элементов и отступы, пригодность к вёрстке, не превращай сайт в художественный постер.",ratio:"16:9",noText:false},
+      icons:{label:"Иконки",icon:"✳",lead:"Создай единый набор современных минималистичных пиктограмм.",subject:"Набор из четырёх иконок преимуществ продукта",goal:"Разработай простые, однозначные символы с одинаковым визуальным весом.",scene:"Чистый нейтральный фон без декора.",composition:"Ровная сетка 2×2, одинаковые поля и размер каждой иконки.",lighting:"Плоская графика без объёмного освещения и теней.",style:"vector",references:"Изображение 1 — стилевой референс линий и пропорций, если есть.",constraints:"Единая толщина линий, одинаковые скругления, без мелких деталей.",ratio:"1:1",noText:true},
+      splash:{label:"Всплеск",icon:"≈",lead:"Создай фотореалистичную изолированную динамическую композицию.",subject:"Густой молочный всплеск с клубникой и бананом",goal:"Сформируй цельную плавную дугу всплеска с небольшими натуральными каплями и ингредиентами.",scene:"Без окружающего пространства; только предметная композиция.",composition:"Динамическая диагональ, элементы не обрезаны, читаемый силуэт.",lighting:"Студийный свет, гладкие влажные поверхности, реалистичные объём и вязкость.",style:"studio3d",references:"Изображение 1 — желаемая форма всплеска, если есть.",constraints:"Не превращай жидкость в твёрдый пластик. Реалистичный масштаб ингредиентов.",ratio:"3:4",noText:true,alpha:true},
+      interior:{label:"Интерьер",icon:"⌂",lead:"Создай фотореалистичную визуализацию редизайна помещения.",subject:"Современная функциональная кухня",goal:"Обнови мебель, отделку и освещение, сохранив архитектуру помещения.",scene:"Тёплый современный минимализм, светлое дерево, матовые фасады.",composition:"Сохрани исходную точку съёмки, размеры комнаты, окна и двери.",lighting:"Дневной свет из окна и мягкий тёплый свет функциональных светильников.",style:"photo",references:"Изображение 1 — фотография существующей комнаты; изображение 2 — стиль интерьера при наличии.",constraints:"Не изменяй несущие стены, размеры проёмов и расположение коммуникаций без указания.",ratio:"По исходнику",preserveFrame:true,noText:true}
+    };
+    const styles = {
+      photo:"Фотореалистичная коммерческая фотография: физически правдоподобные материалы, естественные текстуры, реалистичная перспектива, профессиональная ретушь без пластиковой обработки.",
+      cinema:"Кинематографичная editorial-фотография: выразительная глубина, натуральная оптика, контролируемая цветокоррекция, естественная атмосфера.",
+      studio3d:"Премиальный CGI/3D product render: корректная геометрия, физически реалистичные материалы, плавные блики, высокая точность деталей.",
+      minimal:"Премиальный минимализм: чистая композиция, много свободного пространства, сдержанные цвета, графичная визуальная иерархия.",
+      vector:"Чистая масштабируемая векторная графика: ровные контуры, простая геометрия, единая толщина линий, без случайных деталей.",
+      ui:"Современный производственный UI-дизайн: чёткая сетка, реалистичные компоненты, логичная типографика, доступный контраст и последовательные отступы.",
+      reference:"Сохраняй визуальный стиль исходного изображения; не меняй его без явной инструкции."
+    };
+    const names = Object.keys(presets);
+    const ids = ["subject","goal","scene","composition","lighting","style","references","constraints","ratio","size","preserveProduct","preserveFrame","noText","spaceForText","alpha"];
+    const checks = new Set(["preserveProduct","preserveFrame","noText","spaceForText","alpha"]);
+    const $ = id => document.getElementById(id);
+    let active = "product";
+    let toastTimer;
+    function readData(){
+      const x = {task:active};
+      ids.forEach(id => x[id] = checks.has(id) ? $(id).checked : $(id).value);
+      return x;
+    }
+    function setFields(data){
+      ids.forEach(id=>{
+        if(Object.prototype.hasOwnProperty.call(data,id)){
+          if(checks.has(id)) $(id).checked = Boolean(data[id]);
+          else $(id).value = String(data[id] == null ? "" : data[id]);
+        }else if(checks.has(id)) $(id).checked=false;
+        else if(id === "size") $(id).value="";
+      });
+    }
+    function selectPreset(key,keepSubject=false){
+      if(!presets[key]) return;
+      const previousSubject = $("subject").value;
+      active = key;
+      const base = presets[key];
+      setFields(base);
+      if(keepSubject && previousSubject) $("subject").value = previousSubject;
+      document.querySelectorAll(".preset").forEach(b=>{
+        const selected = b.dataset.key===key;
+        b.classList.toggle("active",selected);
+        b.setAttribute("aria-pressed",String(selected));
+      });
+      $("goalLabel").textContent = key==="edit" ? "Что конкретно изменить" : "Что нужно сделать";
+      update();
+    }
+    function renderPresets(){
+      $("presets").innerHTML="";
+      names.forEach(key=>{
+        const p=presets[key];
+        const b=document.createElement("button");
+        b.type="button";b.className="preset";b.dataset.key=key;
+        const icon=document.createElement("span");icon.className="preset-icon";icon.textContent=p.icon;
+        const label=document.createElement("span");label.className="preset-label";label.textContent=p.label;
+        b.append(icon,label);
+        b.addEventListener("click",()=>selectPreset(key,true));
+        $("presets").appendChild(b);
+      });
+    }
+    function buildPrompt(x){
+      const parts=[];
+      const add=(heading,value)=>{if(String(value??"").trim()) parts.push(heading+"\n"+String(value).trim());};
+      add("ЗАДАЧА",presets[x.task]?.lead||presets.product.lead);
+      add("ГЛАВНЫЙ ОБЪЕКТ",x.subject);
+      add(x.task==="edit"?"ТОЧНОЕ ИЗМЕНЕНИЕ":"ЖЕЛАЕМЫЙ РЕЗУЛЬТАТ",x.goal);
+      add("СЦЕНА И ОКРУЖЕНИЕ",x.scene);
+      add("КОМПОЗИЦИЯ И КАМЕРА",x.composition);
+      add("ОСВЕЩЕНИЕ",x.lighting);
+      add("ВИЗУАЛЬНЫЙ СТИЛЬ",styles[x.style]||styles.photo);
+      add("РОЛИ РЕФЕРЕНСОВ",x.references);
+      const guards=[];
+      if(x.preserveProduct) guards.push("Используй прикреплённый продукт как точный визуальный референс. Сохрани его форму, геометрию, пропорции, крышку, этикетку, надписи, цвета и детали упаковки. Не придумывай новые элементы.");
+      if(x.preserveFrame) guards.push("Сохрани исходный ракурс, положение камеры, перспективу, расположение основных объектов и кадрирование, кроме прямо указанных изменений.");
+      if(x.noText) guards.push("Не добавляй новых надписей, случайного текста, логотипов или водяных знаков.");
+      if(x.spaceForText) guards.push("Оставь чистое свободное пространство для последующего размещения текста. Не заполняй эту область декоративными объектами.");
+      if(x.alpha) guards.push("Фон должен быть действительно прозрачным (alpha channel), а не белым и не шахматной имитацией. Не добавляй подложку. Формат PNG с прозрачностью.");
+      if(x.constraints.trim()) guards.push(x.constraints.trim());
+      if(x.task==="edit") guards.push("Вноси только указанное изменение. Все не упомянутые элементы оставь без изменений.");
+      add("ОГРАНИЧЕНИЯ И СОХРАНЕНИЕ",guards.map((g,i)=>(i+1)+". "+g).join("\n"));
+      const fmt=[x.ratio, x.size.trim()].filter(Boolean).join("; ");
+      add("ФОРМАТ",fmt);
+      return parts.join("\n\n");
+    }
+    function update(){
+      const x=readData();
+      $("output").textContent=buildPrompt(x);
+      $("stats").textContent=$("output").textContent.length.toLocaleString("ru-RU")+" символов · "+$("output").textContent.trim().split(/\s+/).length+" слов";
+      try{localStorage.setItem("promptform-v1",JSON.stringify(x));}catch(e){}
+    }
+    function notify(msg){
+      const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);
+      toastTimer=setTimeout(()=>t.classList.remove("show"),2700);
+    }
+    async function copy(text){
+      if(navigator.clipboard && window.isSecureContext){
+        try{await navigator.clipboard.writeText(text);return true;}catch(e){}
+      }
+      const area=document.createElement("textarea");
+      area.value=text;area.style.position="fixed";area.style.opacity="0";
+      document.body.appendChild(area);area.focus();area.select();
+      let ok=false;try{ok=document.execCommand("copy");}catch(e){}
+      area.remove();return ok;
+    }
+    function shareUrl(){
+      const x=readData();
+      const url=new URL(location.href);
+      url.hash="p="+encodeURIComponent(JSON.stringify(x));
+      return url.toString();
+    }
+    function restore(){
+      let data;
+      if(location.hash.startsWith("#p=")){
+        try{data=JSON.parse(decodeURIComponent(location.hash.slice(3)));}catch(e){}
+      }
+      if(!data){try{data=JSON.parse(localStorage.getItem("promptform-v1")||"null");}catch(e){}}
+      if(data && presets[data.task]){
+        active=data.task;
+        selectPreset(active);
+        setFields(data);
+        update();
+      }else selectPreset("product");
+    }
+    renderPresets();
+    restore();
+    ids.forEach(id=>$(id).addEventListener(checks.has(id)?"change":"input",update));
+    ids.filter(id=>!checks.has(id)).forEach(id=>$(id).addEventListener("change",update));
+    $("copy").addEventListener("click",async()=>notify(await copy($("output").textContent)?"Промпт скопирован":"Не удалось скопировать — выделите текст вручную"));
+    $("download").addEventListener("click",()=>{
+      const blob=new Blob([$("output").textContent],{type:"text/plain;charset=utf-8"});
+      const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="image-prompt-"+active+".txt";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);notify("Промпт сохранён в TXT");
+    });
+    $("share").addEventListener("click",async()=>{
+      if(location.protocol==="file:"){notify("Чтобы делиться ссылкой, опубликуйте HTML на сайте");$("modal").classList.add("visible");return;}
+      const link=shareUrl();
+      notify(await copy(link)?"Ссылка с настройками скопирована":"Не удалось скопировать ссылку");
+    });
+    $("reset").addEventListener("click",()=>{
+      if(location.hash) history.replaceState(null,"",location.pathname+location.search);
+      selectPreset("product");notify("Настройки сброшены");
+    });
+    $("helpButton").addEventListener("click",()=>$("modal").classList.add("visible"));
+    $("closeModal").addEventListener("click",()=>$("modal").classList.remove("visible"));
+    $("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("visible");});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("visible");});
+  })();
+  </script>
+</body>
+</html>
